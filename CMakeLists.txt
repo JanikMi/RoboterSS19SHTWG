@@ -14,6 +14,7 @@ find_package(catkin REQUIRED
     roscpp
     sensor_msgs
     geometry_msgs
+    nav_msgs
 )
 
 ## Find system libraries
@@ -39,6 +40,7 @@ catkin_package(
     roscpp
     sensor_msgs
     geometry_msgs
+    nav_msgs
 #  DEPENDS
 #    Boost
 )

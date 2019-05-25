@@ -11,8 +11,10 @@
 #include <string>
 #include <stdbool.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
 
 sensor_msgs::LaserScan Pub_scan;
+nav_msgs::Odometry globalOdomFrame;
 float SizeOfArray;
 double ranges[5];
 geometry_msgs::Twist base_cmd_turn_left;
@@ -36,6 +38,8 @@ TurtlebotHighlevelController::TurtlebotHighlevelController(ros::NodeHandle& node
 
   
   ros::Subscriber subscriber = nodeHandle.subscribe(topic, queue_size, &TurtlebotHighlevelController::chatterCallback, this);
+  odom_subscriber_ = nodeHandle_.subscribe("/odom", queue_size, &TurtlebotHighlevelController::odomCallback, this);
+
   publisher_ = nodeHandle.advertise<sensor_msgs::LaserScan>("Pub_scan", queue_size);
   cmd_vel_pub_ = nodeHandle.advertise<geometry_msgs::Twist>("cmd_vel", 100);
 
@@ -62,6 +66,11 @@ bool TurtlebotHighlevelController::readParameters()
 void TurtlebotHighlevelController::topicCallback(const sensor_msgs::Temperature& message)
 {
   //algorithm_.addData(message.temperature);
+}
+
+void TurtlebotHighlevelController::odomCallback(const nav_msgs::Odometry odomFrame)
+{
+  globalOdomFrame = odomFrame;
 }
 
 void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
