@@ -1,0 +1,10 @@
+<launch>
+
+    <node pkg="turtlebot_highlevel_controller" type="src/turtlebot_highlevel_controller" name="turtlebot_highlevel_controller_node" output="screen">
+    <!--
+    <param name="subscriber/topic" value="Scan"/>
+    <param name="subscriber/quene_size" value="10"/>
+    -->
+    </node>
+
+</launch>
