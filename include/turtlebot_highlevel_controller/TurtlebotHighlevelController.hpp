@@ -15,7 +15,7 @@
 #include <time.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-
+#include<visualization_msgs/Marker.h>
 namespace HighlevelController {
 
 /*!
@@ -78,7 +78,7 @@ class TurtlebotHighlevelController
 
   ros::Publisher cmd_vel_pub_;
   ros::Publisher publisher_;
-
+  ros::Publisher vis_pub_;
   //! Algorithm computation object.
   //Algorithm algorithm_;
 };
