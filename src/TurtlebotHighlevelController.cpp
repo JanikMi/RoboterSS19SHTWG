@@ -4,7 +4,7 @@ sensor_msgs::LaserScan Pub_scan;
 nav_msgs::Odometry globalOdomFrame;
 float SizeOfArray;
 double ranges[5];
-
+int kp;
  
 namespace HighlevelController {
 
@@ -18,6 +18,12 @@ TurtlebotHighlevelController::TurtlebotHighlevelController(ros::NodeHandle& node
       ros::requestShutdown();
   }
   if(!nodeHandle.getParam("/topic", topic))
+  {
+      ROS_ERROR_STREAM("topic wurde nicht gelesen.");
+      ros::requestShutdown();
+  }
+  // Regelparameter für P-Regler
+  if(!nodeHandle.getParam("/kp", kp))
   {
       ROS_ERROR_STREAM("topic wurde nicht gelesen.");
       ros::requestShutdown();
@@ -115,7 +121,6 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
 
   ROS_INFO("Distanzen: [%f], [%f], [%f], [%f], [%f]", AusgabeSubscriber[0],AusgabeSubscriber[1],AusgabeSubscriber[2],AusgabeSubscriber[3],AusgabeSubscriber);
 
-
   /*
     ros::Time scan_time = ros::Time::now();
     publisher_msg.header.stamp = scan_time;
@@ -149,7 +154,7 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   base_cmd.angular.y = 0.0; 
   if (distance < 5 && distance > 0)
   {
-    base_cmd.angular.z = (alpha/2/3.1416*360  * 0.1);
+    base_cmd.angular.z = (alpha/2/3.1416*360  * kp);
   }
   else
   {
@@ -163,6 +168,7 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   saeule_robo.point.y = sin(alpha)*distance;
   saeule_robo.point.z = 0;
 
+  // Transformieren der Position in Bezug auf Weltkoordinaten
   try
   {
    tf_transform_robo_to_world.transformPoint("odom", saeule_robo, saeule_tf_to_odom);
@@ -172,7 +178,7 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
     ros::Duration(1.0).sleep();
   }
 
-//Hier kommen die Marker
+  // Setzen des Markers
   visualization_msgs::Marker marker;
   marker.header.frame_id = "odom";
   marker.header.stamp = ros::Time();
@@ -190,15 +196,10 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   marker.scale.x = 0.3;
   marker.scale.y = 0.3;
   marker.scale.z = 1.0;
-  marker.color.a = 1.0; // Don't forget to set the alpha!
+  marker.color.a = 1.0; 
   marker.color.r = 0.0;
   marker.color.g = 1.0;
   marker.color.b = 0.0;
-  //only if using a MESH_RESOURCE marker type:
-  //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
-    
-
-
 
   ROS_INFO("alpha, distance, base_cmd.angular.z: [%f], [%f], [%f]", alpha, distance, base_cmd.angular.z);
   
