@@ -75,6 +75,7 @@ add_executable(${PROJECT_NAME}
 )
 
 add_executable(${PROJECT_NAME}_WallFollowing
+  src/WallFollowing_node.cpp
   src/WallFollowing.cpp
 )
 

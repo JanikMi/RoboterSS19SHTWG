@@ -59,8 +59,10 @@
   <rosparam command="load" file="$(find turtlebot_highlevel_controller)/config/parameter.yaml" />
   <rosparam command="load" file="$(find turtlebot_highlevel_controller)/config/piller.yaml" />
 
-<!--  ***************** eigene node starten *****************  -->
+<!--  ***************** Eigene nodes starten *****************  -->
   <node pkg="turtlebot_highlevel_controller" type="turtlebot_highlevel_controller" name="turtlebot_highlevel_controller_node" output="screen"> 
+  </node>
+  <node pkg="turtlebot_highlevel_controller" type="turtlebot_highlevel_controller" name="WallFollowing_node" output="screen"> 
   </node>
 <!---->
 
