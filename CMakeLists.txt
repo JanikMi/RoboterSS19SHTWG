@@ -72,7 +72,10 @@ add_executable(${PROJECT_NAME}
   src/${PROJECT_NAME}_node.cpp
   src/TurtlebotHighlevelController.cpp
   #src/turtlebot_highlevel_controller_node.cpp
+)
 
+add_executable(${PROJECT_NAME}_WallFollowing
+  src/WallFollowing.cpp
 )
 
 ## Add dependencies to exported targets, like ROS msgs or srvs
@@ -95,6 +98,11 @@ target_link_libraries(${PROJECT_NAME}_core
 )
 
 target_link_libraries(${PROJECT_NAME}
+  ${PROJECT_NAME}_core
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_WallFollowing
   ${PROJECT_NAME}_core
   ${catkin_LIBRARIES}
 )

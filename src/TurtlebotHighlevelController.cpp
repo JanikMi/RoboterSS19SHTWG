@@ -4,7 +4,7 @@ sensor_msgs::LaserScan Pub_scan;
 nav_msgs::Odometry globalOdomFrame;
 float SizeOfArray;
 double ranges[5];
-int kp;
+float kp;
  
 namespace HighlevelController {
 
