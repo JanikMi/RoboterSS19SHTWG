@@ -1,26 +1,10 @@
-#include <ros/ros.h>
-#include "std_msgs/String.h"
-#include "std_msgs/Float32.h"
-#include "sensor_msgs/LaserScan.h"
-#include <sstream>
-#include <ros/param.h>
-#include <iostream>
-#include <vector>
-#include <time.h>
 #include "turtlebot_highlevel_controller/TurtlebotHighlevelController.hpp"
-#include <string>
-#include <stdbool.h>
-#include <geometry_msgs/Twist.h>
-#include <nav_msgs/Odometry.h>
-#include<geometry_msgs/PointStamped.h>
-#include<visualization_msgs/Marker.h>
 
 sensor_msgs::LaserScan Pub_scan;
 nav_msgs::Odometry globalOdomFrame;
-geometry_msgs::PointStamped sauele_robo;
 float SizeOfArray;
 double ranges[5];
-geometry_msgs::Twist base_cmd_turn_left;
+
  
 namespace HighlevelController {
 
@@ -52,6 +36,7 @@ TurtlebotHighlevelController::TurtlebotHighlevelController(ros::NodeHandle& node
   ros::Rate r(10); // 10 hz
   while (ros::ok())
   {
+
     ros::spinOnce();
     r.sleep();
   }
@@ -78,7 +63,6 @@ void TurtlebotHighlevelController::odomCallback(const nav_msgs::Odometry odomFra
 
 void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-
   SizeOfArray = msg->ranges.size();
   Pub_scan.ranges.resize(5);
   float AusgabeSubscriber[5];
@@ -88,7 +72,6 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   {
     if (msg->ranges[i] < Min_Distanz)
     {
-      
       Min_Distanz = msg->ranges[i];
       index = i;
     } 
@@ -154,7 +137,7 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   // Position der Säule:
   float alpha;
   float distance;
-  alpha = (msg->angle_min + index *msg->angle_increment)/2/3.1416*360;
+  alpha = (msg->angle_min + index *msg->angle_increment);
   distance = Pub_scan.ranges[2];
 
   // Fahrt zur Säule:
@@ -166,46 +149,53 @@ void TurtlebotHighlevelController::chatterCallback(const sensor_msgs::LaserScan:
   base_cmd.angular.y = 0.0; 
   if (distance < 5 && distance > 0)
   {
-    base_cmd.angular.z = (alpha  * 0.1);
+    base_cmd.angular.z = (alpha/2/3.1416*360  * 0.1);
   }
   else
   {
     base_cmd.angular.z = 0.0;
   }
 
- //Hier werden die Pfeilerposition aus der Robosicht angegeben
-  sauele_robo.header.frame_id = "base_laser_link";
-  sauele_robo.header.stamp = ros::Time();
-  sauele_robo.point.x = cos(alpha)*distance;
-  sauele_robo.point.y = sin(msg->angle_min)*distance;
-  sauele_robo.point.z = 0;
+  //Hier werden die Pfeilerposition aus der Robosicht angegeben
+  saeule_robo.header.frame_id = "base_laser_link";
+  saeule_robo.header.stamp = ros::Time();
+  saeule_robo.point.x = cos(alpha)*distance;
+  saeule_robo.point.y = sin(alpha)*distance;
+  saeule_robo.point.z = 0;
 
+  try
+  {
+   tf_transform_robo_to_world.transformPoint("odom", saeule_robo, saeule_tf_to_odom);
+  }
+  catch (tf2::TransformException &ex) {
+    ROS_WARN("%s",ex.what());
+    ros::Duration(1.0).sleep();
+  }
 
- 
 //Hier kommen die Marker
-    visualization_msgs::Marker marker;
-    marker.header.frame_id = "odom";
-    marker.header.stamp = ros::Time();
-    marker.ns = "HighlevelController";
-    marker.id = 1;
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.pose.position.x = sauele_robo.point.x+globalOdomFrame.pose.pose.position.x;
-    marker.pose.position.y = sauele_robo.point.y+globalOdomFrame.pose.pose.position.y;
-    marker.pose.position.z = sauele_robo.point.z;
-    marker.pose.orientation.x = 0.0;
-    marker.pose.orientation.y = 0.0;
-    marker.pose.orientation.z = 0.0;
-    marker.pose.orientation.w = 1.0;
-    marker.scale.x = 0.1;
-    marker.scale.y = 0.1;
-    marker.scale.z = 1.0;
-    marker.color.a = 1.0; // Don't forget to set the alpha!
-    marker.color.r = 0.0;
-    marker.color.g = 1.0;
-    marker.color.b = 0.0;
-    //only if using a MESH_RESOURCE marker type:
-    //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
+  visualization_msgs::Marker marker;
+  marker.header.frame_id = "odom";
+  marker.header.stamp = ros::Time();
+  marker.ns = "HighlevelController";
+  marker.id = 1;
+  marker.type = visualization_msgs::Marker::SPHERE;
+  marker.action = visualization_msgs::Marker::ADD;
+  marker.pose.position.x = saeule_tf_to_odom.point.x;
+  marker.pose.position.y = saeule_tf_to_odom.point.y;
+  marker.pose.position.z = saeule_tf_to_odom.point.z;
+  marker.pose.orientation.x = 0.0;
+  marker.pose.orientation.y = 0.0;
+  marker.pose.orientation.z = 0.0;
+  marker.pose.orientation.w = 1.0;
+  marker.scale.x = 0.3;
+  marker.scale.y = 0.3;
+  marker.scale.z = 1.0;
+  marker.color.a = 1.0; // Don't forget to set the alpha!
+  marker.color.r = 0.0;
+  marker.color.g = 1.0;
+  marker.color.b = 0.0;
+  //only if using a MESH_RESOURCE marker type:
+  //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
     
 
 

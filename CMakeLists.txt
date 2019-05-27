@@ -16,6 +16,7 @@ find_package(catkin REQUIRED
     geometry_msgs
     nav_msgs
     visualization_msgs
+    tf
 )
 
 ## Find system libraries
@@ -43,6 +44,7 @@ catkin_package(
     geometry_msgs
     nav_msgs
     visualization_msgs
+    tf
 #  DEPENDS
 #    Boost
 )
